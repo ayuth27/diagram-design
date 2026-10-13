@@ -176,6 +176,14 @@ def find_alias_matches(request: str, brands: list[dict[str, Any]]) -> list[tuple
     lowered = request
     for brand in brands:
         for alias in brand["aliases"]:
+            if alias.startswith("cs:") and len(alias) > 3:
+                # Case-sensitive alias, for brand names that are also ordinary
+                # words: "cs:MINI" matches "MINI" but not "a mini diagram".
+                literal = alias[3:]
+                pattern = re.compile(r"(?<![A-Za-z0-9])" + re.escape(literal) + r"(?![A-Za-z0-9])")
+                for match in pattern.finditer(lowered):
+                    matches.append((match.start(), match.end(), brand, alias))
+                continue
             if is_ascii(alias):
                 pattern = re.compile(
                     r"(?<![a-z0-9])" + re.escape(alias.lower()) + r"(?![a-z0-9])",

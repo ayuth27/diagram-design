@@ -93,7 +93,14 @@ def clean_family_name(raw: str) -> str:
     return text.strip(" \t\"'")
 
 
+VAR_REF_RE = re.compile(r"var\(\s*--[\w-]+\s*(?:,[^()]*)?\)", re.IGNORECASE)
+
+
 def split_font_families(value: str) -> list[str]:
+    # A var(--font-x) reference is not a family name: the custom property it
+    # points at is scanned on its own (CUSTOM_FONT_PROP_RE), so drop the
+    # reference here instead of reporting a family called "var".
+    value = VAR_REF_RE.sub("", value)
     return [clean_family_name(part) for part in value.split(",") if clean_family_name(part)]
 
 

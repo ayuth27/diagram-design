@@ -377,6 +377,22 @@ def main() -> int:
         # acme_dir is a directory, not a file, and the brand doesn't exist either way.
         expect("unknown brand: exit 2", code == 2, f"code={code} out={out} err={err}")
 
+    # Case-sensitive aliases: a brand name that is also an ordinary word.
+    cs_brands = [{"slug": "tiny", "aliases": ["cs:TINY"]}]
+    expect("cs alias: exact case matches",
+           len(resolve_mod.find_alias_matches("draw the TINY flow", cs_brands)) == 1)
+    expect("cs alias: lower-case word does not match",
+           resolve_mod.find_alias_matches("draw a tiny flowchart", cs_brands) == [])
+    expect("cs alias: no match inside a longer word",
+           resolve_mod.find_alias_matches("TINYURL export", cs_brands) == [])
+
+    # var(--font-x) is a reference, not a family called "var".
+    check_mod = load_module(CHECK_SCRIPT, "diagram_design_brand_check")
+    expect("font var() reference is not a family",
+           check_mod.split_font_families("var(--font-brand), 'Acme Sans', sans-serif") == ["acme sans", "sans-serif"]
+           or check_mod.split_font_families("var(--font-brand), 'Acme Sans', sans-serif") == ["Acme Sans", "sans-serif"],
+           str(check_mod.split_font_families("var(--font-brand), 'Acme Sans', sans-serif")))
+
     if failures:
         print("\nFAILURES:")
         for failure in failures:
