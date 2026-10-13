@@ -30,6 +30,13 @@ Then branch per the matching section of [`references/onboarding.md`](references/
 
 **Once the style guide has been customized** (or the user explicitly chose default), skip this gate on later runs. A leading profile header names the copied-in active profile. Without a header, any semantic-role value or typography family differing from shipped defaults means **custom-unsaved**: skip the gate and offer to save it as a profile. All-default tokens with no marker/header trigger the gate. After onboarding, offer to save as a named client profile per `references/profiles.md`.
 
+**Brand routing (this fork).** Before drawing anything, run
+`python3 scripts/brand_resolve.py --request "<the user's request>"`. Exit 0
+means a brand was resolved — use its profile and logo instead of the gate
+above. Exit 2 or 3 means ambiguous or unresolved — ask the user; never
+substitute another brand's CI. Full procedure and the `brand_check.py`
+verification step: [`references/brand-ci.md`](references/brand-ci.md).
+
 ---
 
 ## 1. Philosophy
@@ -299,6 +306,7 @@ Run before producing any diagram.
 - [ ] Node origins, dimensions, gaps, padding on the 4px grid; type sizes on the role ramp?
 - [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, content inside the viewBox, motion basics.)
 - [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? From a repository checkout, also run `python3 <repo-root>/scripts/verify-motion.py path/to/generated.html` plus the skin linter; from an installed skill, manually check print and static-query states on top of the self-check.
+- [ ] Brand resolved with scripts/brand_resolve.py, and scripts/brand_check.py <file> --brand <slug> reports 0 findings? (see references/brand-ci.md)
 
 **Typography:**
 
